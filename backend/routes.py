@@ -35,7 +35,9 @@ def count():
 ######################################################################
 @app.route("/picture", methods=["GET"])
 def get_pictures():
-    pass
+    if data:
+        return data, 200
+    return {"message": "Internal server error"}, 500
 
 ######################################################################
 # GET A PICTURE
@@ -44,7 +46,10 @@ def get_pictures():
 
 @app.route("/picture/<int:id>", methods=["GET"])
 def get_picture_by_id(id):
-    pass
+    for pic in data:
+        if pic['id'] == id:
+            return pic,200
+    return "", 404
 
 
 ######################################################################
@@ -52,7 +57,12 @@ def get_picture_by_id(id):
 ######################################################################
 @app.route("/picture", methods=["POST"])
 def create_picture():
-    pass
+    reqdata = request.get_json()
+    if reqdata in data:
+        return {"Message": "picture with id " + str(reqdata["id"]) + " already present"}, 302
+
+    data.append(reqdata)
+    return reqdata, 201
 
 ######################################################################
 # UPDATE A PICTURE
@@ -61,11 +71,25 @@ def create_picture():
 
 @app.route("/picture/<int:id>", methods=["PUT"])
 def update_picture(id):
-    pass
+    reqdata = request.get_json()
+    for i, pic in enumerate(data):
+        if pic["id"] == id:
+            data[i] = reqdata
+            return reqdata, 200
+    return "", 404
+    
 
 ######################################################################
 # DELETE A PICTURE
 ######################################################################
 @app.route("/picture/<int:id>", methods=["DELETE"])
 def delete_picture(id):
-    pass
+    for pic in data:
+        if pic["id"] == id:
+            # del pic
+            data.remove(pic)
+            return "", 204
+    # if data[id]:
+        # del data[id]
+        # return "", 204
+    return "", 404
